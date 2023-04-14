@@ -1,51 +1,60 @@
+## Import libraries
 import os
 import serial
 import time
+from datetime import datetime
+
+# Change directory to storage location
 
 os.chdir('c:/Users/sanme/Desktop/Jackal/Data')
-freq = 1.05e5
+
+# Sampling frequency and sampling rate
+freq = int(1.05e5)
 samplingRate = 1 / freq
 
-PORT = "COM8"
-BAUD = 115200
+# Serial port connection
 
-if __name__ == "__main__":
+PORT = "COM8"           # Enter custom port
+BAUD = 115200           # Enter baud rate
 
-    ser = serial.Serial(
-        port=PORT,
-        baudrate=BAUD,
-        timeout=1
-    )
-    ser.flush()
+ser = serial.Serial(
+    port=PORT,
+    baudrate=BAUD,
+    timeout=1           # Change timeout if necessory
+)
+ser.flush()
 
-    while True:
-        if ser.in_waiting > 0:
+#------------------------------Main loop below---------------------------------------
+if __name__ == '__main__':
 
-            ser.write(b"Initiate\n")
-            line = ser.readline().decode('utf-8').rstrip()
+        # Begin connection attempt
+        ser.write(b"Initiate\n")
+        line = ser.readline().decode('utf-8').rstrip()
 
-            if str(line) == "Attempting to connect":
+        if str(line) == "Attempting to connect":
 
-                ser.write(b"Connection Successful!\n")
+            ser.write(b"Connection Successful!\n")              # Achieved connection
 
-                line2 = ser.readline().decode('utf-8').rstrip()
+            line2 = ser.readline().decode('utf-8').rstrip()
 
-                ser.write(b"startCode\n")
+            ser.write(b"startCode\n")                           # Data acquisition begins
 
-                if str(line2) == "Starting program in 2 seconds":
+            if str(line2) == "Starting program in 2 seconds":
 
-                    print("Enter number of runs")
-                    n = int(input())
+                print("Enter number of runs: \n")                   # Provide number of runs
+                n = int(input())
 
+                while True:
                     for i in range(0, n):
-
-                        file = open("Data.txt", 'w')
+                        timestamp = datetime.now().strftime('%Y%m%d')[:-3]              # Timestamp
                         time.sleep(2)
+                        FileName = timestamp + ".txt"                                   # Create File
 
-                        for j in range(0, 2*freq):
-                            data = ser.readline().decode('utf-8').rstrip()
+                        with open(FileName, 'w') as file:
 
-                            file.write(str(data) + '\n')
-                            time.sleep(samplingRate)
+                            for j in range(0, 2*freq):
+                                data = ser.readline().decode('utf-8').rstrip()
 
-                        file.close()
+                                file.write(str(data) + '\n')
+                                time.sleep(samplingRate)
+#------------------------------Main loop above---------------------------------------
