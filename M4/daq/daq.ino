@@ -1,7 +1,7 @@
-const int samplingRate = 1 / 1.05e5;
-const int baudRate = 115200;
+const int samplingRate = 1 / 1.05e5;  // Sampling rate = 1/frequency
+const int baudRate = 9600;            // baud rate
 double micData = 0;
-const int mic = A0;
+#define mic A0
 const int samplingTime = 10;  // Sampling time in seconds
 
 String command_1;
@@ -15,52 +15,55 @@ void setup() {
 
   Serial.begin(baudRate);
 
-  command_1 = Serial.readStringUntil('\n');
+  _init_();
 
-  if (command_1.equals("Initiate") == false) {
-    while(1){}
-  }
-  else if(command_1.equals("Initiate") == true){
-    connect();
-  }
-  command_2 = Serial.readStringUntil('\n');
-
-  if (command_2.equals("startCode")) {
-    loop();
-  } else {
-    disconnect();
-  }
+  startCode();
 }
+
 
 
 void loop() {
 
-  micData = analogRead(mic);
-  Serial.println(micData);
+  listen();
   delay(samplingRate);
 }
 
-
+// Connecting M4 to Jackal via serial port
 
 void connect() {
-  for (int i = 0; i < 3; i++) {
 
-    Serial.println("Attempting to connect");
-    delay(100);
+  Serial.println("Attempting to connect\n");
 
+  report = Serial.readStringUntil('\n');
+
+  while (report.equals("Connection Successful!") == false) {
     report = Serial.readStringUntil('\n');
-    delay(1000);
   }
 }
 
-void disconnect() {
-  if (report.equals("Connection Successful!")) {
-    Serial.println("Starting program in 2 seconds");
-    delay(10000);
-  } else {
-    Serial.println("Connection failed :(");
-    delay(100);
-    Serial.println("Ending program in 2 seconds");
-    delay(2000);
+void _init_() {
+
+  command_1 = Serial.readStringUntil('\n');
+
+  while (command_1.equals("Initiate") == false) {
+    command_1 = Serial.readStringUntil('\n');
   }
+  connect();
+}
+
+void startCode() {
+
+  Serial.println("Starting program in 2 seconds\n");
+
+  command_2 = Serial.readStringUntil('\n');
+  while (command_2.equals("startCode") == false) {
+    command_2 = Serial.readStringUntil('\n');
+  }
+  delay(2000);
+  loop();
+}
+
+void listen() {
+  micData = analogRead(mic);
+  Serial.println(micData);
 }
