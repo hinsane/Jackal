@@ -1,5 +1,5 @@
 const int samplingRate = 1 / 1.05e5;  // Sampling rate = 1/frequency
-const int baudRate = 9600;            // baud rate
+const int baudRate = 500000;            // baud rate
 double micData = 0;
 #define mic A0
 const int samplingTime = 10;  // Sampling time in seconds

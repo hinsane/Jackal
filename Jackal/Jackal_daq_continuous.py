@@ -29,14 +29,14 @@ if __name__ == '__main__':
         # Begin connection attempt
         ser.write(b"Initiate\n")
         line = ser.readline().decode('utf-8').rstrip()
-
+        print(line)
         while str(line) != "Attempting to connect":
             line = ser.readline().decode('utf-8').rstrip()
 
         ser.write(b"Connection Successful!\n")  # Achieved connection
 
         line2 = ser.readline().decode('utf-8').rstrip()
-
+        print(line2)
         ser.write(b"startCode\n")  # Data acquisition begins
 
         while str(line2) != "Starting program in 2 seconds":
@@ -47,13 +47,14 @@ if __name__ == '__main__':
             for i in range(0, n):
                 timestamp = datetime.now().strftime('%Y%m%d')[:-3]  # Timestamp
                 time.sleep(2)
-                FileName = timestamp + ".txt"  # Create File
+                FileName = str(timestamp) + ".txt"  # Create File
 
                 with open(FileName, 'w') as file:
 
                     for j in range(0, 2 * freq):
                         data = ser.readline().decode('utf-8').rstrip()
-
+                        print(data)
                         file.write(str(data) + '\n')
                         time.sleep(samplingRate)
+                    file.close()
 # ------------------------------Main loop above---------------------------------------
